@@ -160,10 +160,10 @@ function renderD3(svgRef, data) {
 
 function App() {
   const [data, setData] = useState(mockData);
-  const svgRef = useRef(null);
+  const gRef = useRef(null);
 
   useEffect(() => {
-    renderD3(svgRef, data);
+    renderD3(gRef, data);
   }, [data]);
 
   const handleNewData = () => {
@@ -176,7 +176,9 @@ function App() {
 
   return (
     <>
-      <svg ref={svgRef} width={500} height={500} />
+      <svg width={800} height={700}>
+        <g ref={gRef} transform={"translate(50,50)"} />
+      </svg>
       <button onClick={handleNewData}>click</button>
       <button onClick={handleDelete}>delete</button>
     </>
