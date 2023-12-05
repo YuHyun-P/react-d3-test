@@ -107,24 +107,15 @@ function renderD3(svgRef, data) {
     .selectAll("line")
     .data(treeData.links())
     .join(
-      (enter) =>
-        enter
-          .append("line")
-          .attr("x1", (d) => d.source.x)
-          .attr("y1", (d) => d.source.y)
-          .attr("x2", (d) => d.target.x)
-          .attr("y2", (d) => d.target.y)
-          .attr("stroke", "black")
-          .style("opacity", 0),
-      (update) =>
-        update
-          .attr("x1", (d) => d.source.x)
-          .attr("y1", (d) => d.source.y)
-          .attr("x2", (d) => d.target.x)
-          .attr("y2", (d) => d.target.y)
-          .attr("stroke", "black"),
+      (enter) => enter.append("line").style("opacity", 0),
+      (update) => update,
       (exit) => exit.transition().duration(1000).style("opacity", 0).remove()
     )
+    .attr("x1", (d) => d.source.x)
+    .attr("y1", (d) => d.source.y)
+    .attr("x2", (d) => d.target.x)
+    .attr("y2", (d) => d.target.y)
+    .attr("stroke", "black")
     .transition()
     .duration(1000)
     .style("opacity", 0.75);
@@ -136,19 +127,13 @@ function renderD3(svgRef, data) {
     .selectAll("circle")
     .data(treeData.descendants())
     .join(
-      (enter) =>
-        enter
-          .append("circle")
-          .attr("cx", (d) => d.x)
-          .attr("cy", (d) => d.y)
-          .attr("r", 10),
-      (update) =>
-        update
-          .attr("cx", (d) => d.x)
-          .attr("cy", (d) => d.y)
-          .attr("r", 10),
+      (enter) => enter.append("circle"),
+      (update) => update,
       (exit) => exit.transition().duration(1000).style("opacity", 0).remove()
     )
+    .attr("cx", (d) => d.x)
+    .attr("cy", (d) => d.y)
+    .attr("r", 10)
     .transition()
     .duration(1000)
     .style("opacity", 1);
@@ -161,13 +146,13 @@ function renderD3(svgRef, data) {
       (enter) =>
         enter
           .append("text")
-          .attr("x", (d) => d.x + 15)
-          .attr("y", (d) => d.y)
           .style("opacity", 0)
           .text((d) => d.data.message),
       (update) => update.attr("x", (d) => d.x + 15).attr("y", (d) => d.y),
       (exit) => exit.transition().duration(1000).style("opacity", 0).remove()
     )
+    .attr("x", (d) => d.x + 15)
+    .attr("y", (d) => d.y)
     .transition()
     .duration(1000)
     .style("opacity", 1);
