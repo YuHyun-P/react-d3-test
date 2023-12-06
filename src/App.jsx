@@ -1,91 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
-
-const mockData = [
-  {
-    id: "4402a0857d0d8744b628497629fdab0321409b0b",
-    parentId: "21143936ef1d1b350c3694dc8af0530b8434b39b",
-    message: "브랜치 성공",
-  },
-  {
-    id: "21143936ef1d1b350c3694dc8af0530b8434b39b",
-    parentId: "f6cfd82dfea8ac87b3150d441f1ca71aff418df2",
-    message: "test",
-  },
-  {
-    id: "75c4aca42bfedcb90bcd9f65be28bd9e013ad971",
-    parentId: "f6cfd82dfea8ac87b3150d441f1ca71aff418df2",
-    message: "config: gitignore에 zero-install 추가",
-  },
-  {
-    id: "f6cfd82dfea8ac87b3150d441f1ca71aff418df2",
-    parentId: "",
-    message: "config: 기본 개발 환경 세팅",
-  },
-];
-
-const newMockData = [
-  {
-    id: "4402a0857d0d8744b628497629fdab0321409b0b",
-    parentId: "21143936ef1d1b350c3694dc8af0530b8434b39b",
-    message: "브랜치 성공",
-  },
-  {
-    id: "21143936ef1d1b350c3694dc8af0530b8434b39b",
-    parentId: "f6cfd82dfea8ac87b3150d441f1ca71aff418df2",
-    message: "test",
-  },
-  {
-    id: "75c4aca42bfedcb90bcd9f65be28bd9e013ad971",
-    parentId: "f6cfd82dfea8ac87b3150d441f1ca71aff418df2",
-    message: "config: gitignore에 zero-install 추가",
-  },
-  {
-    id: "33333",
-    parentId: "44444",
-    message: "추가1",
-  },
-  {
-    id: "44444",
-    parentId: "f6cfd82dfea8ac87b3150d441f1ca71aff418df2",
-    message: "추가2",
-  },
-  {
-    id: "f6cfd82dfea8ac87b3150d441f1ca71aff418df2",
-    parentId: "",
-    message: "config: 기본 개발 환경 세팅",
-  },
-];
-
-const deletedData = [
-  {
-    id: "4402a0857d0d8744b628497629fdab0321409b0b",
-    parentId: "21143936ef1d1b350c3694dc8af0530b8434b39b",
-    message: "브랜치 성공",
-  },
-  {
-    id: "21143936ef1d1b350c3694dc8af0530b8434b39b",
-    parentId: "f6cfd82dfea8ac87b3150d441f1ca71aff418df2",
-    message: "test",
-  },
-  {
-    id: "75c4aca42bfedcb90bcd9f65be28bd9e013ad971",
-    parentId: "f6cfd82dfea8ac87b3150d441f1ca71aff418df2",
-    message: "config: gitignore에 zero-install 추가",
-  },
-  {
-    id: "44444",
-    parentId: "f6cfd82dfea8ac87b3150d441f1ca71aff418df2",
-    message: "추가2",
-  },
-  {
-    id: "f6cfd82dfea8ac87b3150d441f1ca71aff418df2",
-    parentId: "",
-    message: "config: 기본 개발 환경 세팅",
-  },
-];
+import { mockData, newMockData, deletedData } from "./data.js";
 
 function renderD3(svgRef, data) {
+  let additionalLinks = [];
+
   // Stratify the data
   const stratify = d3
     .stratify()
@@ -102,26 +21,8 @@ function renderD3(svgRef, data) {
   // Select the root of the tree and bind the data
   const svg = d3.select(svgRef.current);
 
-  // Draw edges (links) between nodes
-  svg
-    .selectAll("line")
-    .data(treeData.links())
-    .join(
-      (enter) => enter.append("line").style("opacity", 0),
-      (update) => update,
-      (exit) => exit.transition().duration(1000).style("opacity", 0).remove()
-    )
-    .attr("x1", (d) => d.source.x)
-    .attr("y1", (d) => d.source.y)
-    .attr("x2", (d) => d.target.x)
-    .attr("y2", (d) => d.target.y)
-    .attr("stroke", "black")
-    .transition()
-    .duration(1000)
-    .style("opacity", 0.75);
-
   // Draw nodes
-  console.log(treeData.descendants());
+  // console.log(treeData.descendants());
 
   svg
     .selectAll("circle")
@@ -156,10 +57,44 @@ function renderD3(svgRef, data) {
     .transition()
     .duration(1000)
     .style("opacity", 1);
+
+  // source
+  let pairNode1 = treeData.descendants().filter(function (d) {
+    return d["id"] === "33333";
+  })[0];
+  // target
+  let pairNode2 = treeData.descendants().filter(function (d) {
+    return d["id"] === "75c4aca42bfedcb90bcd9f65be28bd9e013ad971";
+  })[0];
+
+  console.log(pairNode1, pairNode2);
+  let link = new Object();
+  link.source = pairNode1;
+  link.target = pairNode2;
+  additionalLinks.push(link);
+  console.log(additionalLinks);
+
+  // Draw edges (links) between nodes
+  svg
+    .selectAll("line")
+    .data([...treeData.links(), ...additionalLinks])
+    .join(
+      (enter) => enter.append("line").style("opacity", 0),
+      (update) => update,
+      (exit) => exit.transition().duration(1000).style("opacity", 0).remove()
+    )
+    .attr("x1", (d) => d.source.x)
+    .attr("y1", (d) => d.source.y)
+    .attr("x2", (d) => d.target.x)
+    .attr("y2", (d) => d.target.y)
+    .attr("stroke", "black")
+    .transition()
+    .duration(1000)
+    .style("opacity", 0.75);
 }
 
 function App() {
-  const [data, setData] = useState(mockData);
+  const [data, setData] = useState(newMockData);
   const gRef = useRef(null);
 
   useEffect(() => {
