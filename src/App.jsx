@@ -1,11 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
-import { mockData, newMockData, deletedData, initialData } from "./data.js";
+import { newMockData, deletedData, initialData } from "./data.js";
 import { parsingMultipleParents } from "./parsing.js";
 
 function renderD3(svgRef, data) {
   const { parsedData, additionalLinks } = parsingMultipleParents(data);
   const addedLine = [];
+
+  const color = [
+    "#8dd3c7",
+    "#ffffb3",
+    "#bebada",
+    "#fb8072",
+    "#80b1d3",
+    "#fdb462",
+    "#b3de69",
+    "#fccde5",
+    "#d9d9d9",
+    "#bc80bd",
+    "#ccebc5",
+    "#ffed6f",
+  ];
 
   // Stratify the data
   const stratify = d3
@@ -37,6 +52,7 @@ function renderD3(svgRef, data) {
     .transition()
     .duration(1000)
     .style("opacity", 1);
+
   // Add text next to each node
 
   svg
