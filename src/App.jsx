@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
-import { mockData, newMockData, deletedData } from "./data.js";
+import { initialData, newMockData, deletedData } from "./data.js";
 
 function renderD3(svgRef, data) {
   let additionalLinks = [];
@@ -20,9 +20,6 @@ function renderD3(svgRef, data) {
 
   // Select the root of the tree and bind the data
   const svg = d3.select(svgRef.current);
-
-  // Draw nodes
-  // console.log(treeData.descendants());
 
   svg
     .selectAll("circle")
@@ -58,20 +55,33 @@ function renderD3(svgRef, data) {
     .duration(1000)
     .style("opacity", 1);
 
-  // source
-  let pairNode1 = treeData.descendants().filter(function (d) {
-    return d["id"] === "33333";
-  })[0];
-  // target
-  let pairNode2 = treeData.descendants().filter(function (d) {
-    return d["id"] === "75c4aca42bfedcb90bcd9f65be28bd9e013ad971";
-  })[0];
+  const multipleParentsLink = [
+    {
+      parents: "75c4aca42bfedcb90bcd9f65be28bd9e013ad971",
+      child: "33333",
+    },
+    {
+      parents: "75c4aca42bfedcb90bcd9f65be28bd9e013ad971",
+      child: "4402a0857d0d8744b628497629fdab0321409b0b",
+    },
+  ];
 
-  console.log(pairNode1, pairNode2);
-  let link = new Object();
-  link.source = pairNode1;
-  link.target = pairNode2;
-  additionalLinks.push(link);
+  multipleParentsLink.forEach(({ parents, child }) => {
+    let sourceNode = treeData.descendants().filter(function (d) {
+      return d["id"] === child;
+    })[0];
+    // target
+    let targetNode = treeData.descendants().filter(function (d) {
+      return d["id"] === parents;
+    })[0];
+
+    let link = new Object();
+    link.source = sourceNode;
+    link.target = targetNode;
+    additionalLinks.push(link);
+  });
+  // source
+
   console.log(additionalLinks);
 
   // Draw edges (links) between nodes
