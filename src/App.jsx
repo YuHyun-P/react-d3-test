@@ -2,25 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { newMockData, deletedData, initialData } from "./data.js";
 import { parsingMultipleParents } from "./parsing.js";
+import fillColor from "./fillColor.js";
 
 function renderD3(svgRef, data) {
   const { parsedData, additionalLinks } = parsingMultipleParents(data);
   const addedLine = [];
-
-  const color = [
-    "#8dd3c7",
-    "#ffffb3",
-    "#bebada",
-    "#fb8072",
-    "#80b1d3",
-    "#fdb462",
-    "#b3de69",
-    "#fccde5",
-    "#d9d9d9",
-    "#bc80bd",
-    "#ccebc5",
-    "#ffed6f",
-  ];
 
   // Stratify the data
   const stratify = d3
@@ -34,24 +20,11 @@ function renderD3(svgRef, data) {
 
   // Apply the tree layout to the hierarchical data
   const treeData = treeLayout(rootNode);
+  // console.log(treeData);
+  fillColor(treeData);
 
   // Select the root of the tree and bind the data
   const svg = d3.select(svgRef.current);
-
-  svg
-    .selectAll("circle")
-    .data(treeData.descendants())
-    .join(
-      (enter) => enter.append("circle"),
-      (update) => update,
-      (exit) => exit.transition().duration(1000).style("opacity", 0).remove()
-    )
-    .attr("cx", (d) => d.x)
-    .attr("cy", (d) => d.y)
-    .attr("r", 10)
-    .transition()
-    .duration(1000)
-    .style("opacity", 1);
 
   // Add text next to each node
 
@@ -89,7 +62,7 @@ function renderD3(svgRef, data) {
   });
   // source
 
-  console.log(addedLine);
+  // console.log(addedLine);
 
   // Draw edges (links) between nodes
   svg
@@ -108,6 +81,25 @@ function renderD3(svgRef, data) {
     .transition()
     .duration(1000)
     .style("opacity", 0.75);
+
+  svg
+    .selectAll("circle")
+    .data(treeData.descendants())
+    .join(
+      (enter) => enter.append("circle"),
+      (update) => update,
+      (exit) => exit.transition().duration(1000).style("opacity", 0).remove()
+    )
+    .attr("cx", (d) => d.x)
+    .attr("cy", (d) => d.y)
+    .attr("r", 10)
+    .transition()
+    .duration(1000)
+    .style("opacity", 1)
+    .attr("fill", (d) => {
+      console.log(d);
+      return d.data.color;
+    });
 }
 
 function App() {
