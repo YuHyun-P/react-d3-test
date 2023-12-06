@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
-import { initialData, newMockData, deletedData } from "./data.js";
+import { mockData, newMockData, deletedData, initialData } from "./data.js";
+import { parsingMultipleParents } from "./parsing.js";
 
 function renderD3(svgRef, data) {
-  let additionalLinks = [];
+  const { parsedData, additionalLinks } = parsingMultipleParents(data);
+  const addedLine = [];
 
   // Stratify the data
   const stratify = d3
     .stratify()
     .parentId((d) => d.parentId)
     .id((d) => d.id);
-  const rootNode = stratify(data);
+  const rootNode = stratify(parsedData);
 
   // Create a tree layout
   const treeLayout = d3.tree().size([400, 300]);
@@ -55,39 +57,28 @@ function renderD3(svgRef, data) {
     .duration(1000)
     .style("opacity", 1);
 
-  const multipleParentsLink = [
-    {
-      parents: "75c4aca42bfedcb90bcd9f65be28bd9e013ad971",
-      child: "33333",
-    },
-    {
-      parents: "75c4aca42bfedcb90bcd9f65be28bd9e013ad971",
-      child: "4402a0857d0d8744b628497629fdab0321409b0b",
-    },
-  ];
-
-  multipleParentsLink.forEach(({ parents, child }) => {
+  additionalLinks.forEach(({ id, parentId }) => {
     let sourceNode = treeData.descendants().filter(function (d) {
-      return d["id"] === child;
+      return d["id"] === id;
     })[0];
     // target
     let targetNode = treeData.descendants().filter(function (d) {
-      return d["id"] === parents;
+      return d["id"] === parentId;
     })[0];
 
     let link = new Object();
     link.source = sourceNode;
     link.target = targetNode;
-    additionalLinks.push(link);
+    addedLine.push(link);
   });
   // source
 
-  console.log(additionalLinks);
+  console.log(addedLine);
 
   // Draw edges (links) between nodes
   svg
     .selectAll("line")
-    .data([...treeData.links(), ...additionalLinks])
+    .data([...treeData.links(), ...addedLine])
     .join(
       (enter) => enter.append("line").style("opacity", 0),
       (update) => update,
@@ -104,7 +95,7 @@ function renderD3(svgRef, data) {
 }
 
 function App() {
-  const [data, setData] = useState(newMockData);
+  const [data, setData] = useState(initialData);
   const gRef = useRef(null);
 
   useEffect(() => {
